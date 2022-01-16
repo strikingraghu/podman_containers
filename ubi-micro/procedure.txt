@@ -25,4 +25,3 @@ httpd
 Verification steps
 1. Display details about the ubi-micro-httpd image:
 # podman images ubi-micro-httpd
--- You should see the image built via buildah module
