@@ -1,5 +1,7 @@
 podman ps -a
 podman images or podman image list
+podman image prune
+podman stop <containerID>
 
 Launching Wordpress POD on Podman instance:
 podman pod create --name dev-wordpress --publish 8080:80
