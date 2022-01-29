@@ -7,3 +7,62 @@ Launching Wordpress POD on Podman instance:
 podman pod create --name dev-wordpress --publish 8080:80
 podman run --detach --pod dev-wordpress -e MYSQL_ROOT_PASSWORD="password" -e MYSQL_DATABASE=wpdb -e MYSQL_USER=mysqluser -e MYSQL_PASSWORD="welcome" --name wp-db mariadb
 podman run --detach --pod dev-wordpress -e WORDPRESS_DB_HOST='127.0.0.1' -e WORDPRESS_DB_NAME=wpdb -e WORDPRESS_DB_USER=mysqluser -e WORDPRESS_DB_PASSWORD="welcome" --name wp-app wordpress
+
+Podman Containers - Beginner's Guide
+Podman is an open-source tool for managing containers, images, volumes, and pods (group of containers). Podman is based on libpod library APIs for managing container lifecycles and supports multiple container image formats, including OCI (Open Container Initiative) and Docker images.
+Unlike other container tools implementations, the tools described here do not center around the monolithic Docker container engine and docker command. Instead, Red Hat provides a set of command-line tools that can operate without a container engine. These include: 
+podman - for directly managing pods and container images (ps, run, stop, start, attach, exec, and so on) 
+buildah - for building, pushing, and signing container images 
+skopeo - for copying, inspecting, deleting, and signing images 
+runc - for providing container run and build features to podman and buildah 
+crun - an optional runtime that can be configured and gives greater flexibility, control, and security for rootless containers
+
+Difference between Docker containers vs Podman containers:
+Now, let's proceed further on installation steps:
+Step #1 - Podman Installation Process:
+RHEL8
+Podman is included in the container-tools module, along with Buildah and Skopeo.
+sudo yum module enable -y container-tools:rhel8
+sudo yum module install -y container-tools:rhel8
+Ubuntu
+The podman package is available in the official repositories for Ubuntu 20.10 and newer.
+# Ubuntu 20.10 and newer
+sudo apt-get -y update
+sudo apt-get -y install podman
+CentOS
+Podman is available in the default Extras repos for CentOS 7 and in the AppStream repo for CentOS 8 and Stream.
+sudo yum -y install podman
+Debian
+The podman package is available in the Debian 11 (Bullseye) repositories and later.
+sudo apt-get -y install podman
+Fedora
+sudo dnf -y install podman
+End of installation procedures…..Let's get into running Podman containers and pods…!
+
+Step #2 - Running Podman Containers:
+In this stage, we are going to learn few commands to Run, Checking Status, Stopping and Restarting containers.
+Do a quick validation for any containers that might be running or in a stopped state. Actually, we just installed the Podman packages and yet to run containers. But, it's always a good practice to check what's running before starting new containers.
+$ podman ps -a
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+[ List containers
+Description:
+  Prints out information about the containers
+Usage:
+  podman ps [options]
+Examples:
+  podman ps -a
+  podman ps -a --format "{{.ID}}  {{.Image}}  {{.Labels}}  {{.Mounts}}"
+  podman ps --size --sort names ]
+Search for a specific image in Docker or Redhat registry that is required to run our first container. In this example: we are searching for 'HTTP' container. 
+→ After going through the steps, repeat these steps for Nginx or Tomcat container deployment as lab exercises. So that, you get lot of confidence to run at large scale
+$ podman search httpd
+Search registry for image
+Description:
+  Search registries for a given image. Can search all the default registries or a specific registry. Users can limit the number of results, and filter the output based on certain conditions.
+Usage:
+  podman search [options] TERM
+Examples:
+  podman search --filter=is-official --limit 3 alpine
+
+(You will see a list of images available in the Redhat or Docker registry. Please copy the 'Name' of the image.
+Example: docker.io docker.io/library/httpd Apache HTTP Server)
