@@ -66,3 +66,64 @@ Examples:
 
 (You will see a list of images available in the Redhat or Docker registry. Please copy the 'Name' of the image.
 Example: docker.io docker.io/library/httpd Apache HTTP Server)
+Let's run HTTP container taking the image name captured in the previous (above) command.
+$ podman run -dt docker.io/centos/httpd-24-centos8
+Trying to pull docker.io/centos/httpd-24-centos8:latest...
+Getting image source signatures
+Copying blob 3c72a8ed6814 done
+Copying blob afdf2ecdaa2f done
+Copying blob a1d926117d46 done
+Copying blob 42c269fe6f7b done
+Copying blob 74241943e2c2 done
+Copying blob 07a0da26acf9 done
+Copying blob 9e6c9d2db631 done
+Copying blob a33035987d8c done
+Copying blob eefe613be3f4 done
+Copying config 7d2fe0e482 done
+Writing manifest to image destination
+Storing signatures
+7ac5a3ab02fc262cea888d71eb1a08f086aa51ef374e31ec23a2bda04608503d
+Note: -dt (Using --detach and --tty parameters, which helps us to run container in background mode and allocate a pseudo-TTY for container respectively)
+Now, let's see the status of the HTTPD container by using below command.
+$ podman ps -a
+(ContainerID) 7ac5a3ab02fc3 (Status) 3 minutes ago  Up 3 minutes ago
+Note: I have trimmed the output of this command. You should see in a tabular format with more details
+Congratulations, you have successfully finished running containers via Podman. Try to repeat these steps for Nginx, Tomcat or MySQL images. You will get lot of hands-on as well. Next, we will get into validating, managing containers and learning more on container specifications like Network, Storage and Monitoring aspects.
+
+Step #3 - Managing Podman Containers:
+Now, we will learn few basic podman command functionalities to create, run, stop, start, restart and pause containers.
+$ podman create --name=pms docker.io/plexinc/pms-docker
+Trying to pull docker.io/plexinc/pms-docker:latest...
+Getting image source signatures
+Copying blob 7b1a6ab2e44d done
+Copying blob 6fd5e19b3041 done
+Copying blob bb4e3e690d6d done
+Copying blob c7144ddbc09f done
+Copying config 6749cc56cf done
+Writing manifest to image destination
+Storing signatures
+f18fdb3550fcd07446d07e4d7f15548a8d7b9fe317698220d4715b89a1e22b12
+$ podman ps -a
+CONTAINERID    IMAGE         CREATED       STATUS     NAMES
+f18fdb3550fc  pms-docker   4 seconds ago   Created     pms
+Note: Here, we are just creating a container and not yet started. We have to use start command to run the containers. Alternatively, we can directly use 'podman run' command to create and run container in one-shot.
+Let's run the container and play with other command functionalities.
+$ podman container start f18fdb3550fc 
+[f18fdb3550fc is the container id in my machine]
+Note: I have used 'podman container' CLI method to start a container. Otherwise, we can also start a container using podman start <IMAGE ID>, where both options are same! One thing to note, podman provides multiple ways to stop, start, restart or kills commands. Try to learn them by switching the methods provided.
+Another example of similar nature is 'podman images' and 'podman image list' command. Both options are provide a list a images available in local registry.
+Other command functionalities that are used for managing containers.
+$ podman stop f18fdb3550fc
+[f18fdb3550fc is the container id in my machine]
+$ podman container restart f18fdb3550fc
+[f18fdb3550fc is the container id in my machine]
+$ podman pause f18fdb3550fc
+[f18fdb3550fc is the container id in my machine]
+$ podman unpause f18fdb3550fc
+f18fdb3550fcd07446d07e4d7f15548a8d7b9fe317698220d4715b89a1e22b12
+[f18fdb3550fc is the container id in my machine]
+Note: Loads of such utilities, please visit RedHat documentation for more details and hands-on labs!
+
+Step #4 - Podman Container Storage, Networking and Monitoring aspects:
+Now, we will learn few basic podman command functionalities to create, run, stop, start, restart and pause containers.
+
