@@ -1,15 +1,8 @@
-podman ps -a
-podman images or podman image list
-podman image prune
-podman stop <containerID>
-
-Launching Wordpress POD on Podman instance:
-podman pod create --name dev-wordpress --publish 8080:80
-podman run --detach --pod dev-wordpress -e MYSQL_ROOT_PASSWORD="password" -e MYSQL_DATABASE=wpdb -e MYSQL_USER=mysqluser -e MYSQL_PASSWORD="welcome" --name wp-db mariadb
-podman run --detach --pod dev-wordpress -e WORDPRESS_DB_HOST='127.0.0.1' -e WORDPRESS_DB_NAME=wpdb -e WORDPRESS_DB_USER=mysqluser -e WORDPRESS_DB_PASSWORD="welcome" --name wp-app wordpress
-
 Podman Containers - Beginner's Guide
 Podman is an open-source tool for managing containers, images, volumes, and pods (group of containers). Podman is based on libpod library APIs for managing container lifecycles and supports multiple container image formats, including OCI (Open Container Initiative) and Docker images.
+Running the container tools such as Podman, Skopeo, or Buildah as a user with superuser privileges (root user) is the best way to ensure that your containers have full access to any feature available on your system. 
+However, with the feature called "Rootless Containers" generally available as of RHEL 8.1, you can work with containers as a regular user. Although container engines, such as Docker, let you run Docker commands as a regular (non-root) user, the Docker daemon that carries out those requests runs as root. As a result, regular users can make requests through their containers that can harm the system. 
+By setting up rootless container users, system administrators prevent potentially damaging container activities from regular users, while still allowing those users to safely run most container features under their own accounts.
 Unlike other container tools implementations, the tools described here do not center around the monolithic Docker container engine and docker command. Instead, Red Hat provides a set of command-line tools that can operate without a container engine. These include: 
 podman - for directly managing pods and container images (ps, run, stop, start, attach, exec, and so on) 
 buildah - for building, pushing, and signing container images 
@@ -18,8 +11,8 @@ runc - for providing container run and build features to podman and buildah�
 crun - an optional runtime that can be configured and gives greater flexibility, control, and security for rootless containers
 
 Difference between Docker containers vs Podman containers:
-Now, let's proceed further on installation steps:
-Step #1 - Podman Installation Process:
+Now, let's proceed further on the installation steps:
+Section #1 - Podman Installation Process:
 RHEL8
 Podman is included in the container-tools module, along with Buildah and Skopeo.
 sudo yum module enable -y container-tools:rhel8
@@ -39,7 +32,7 @@ Fedora
 sudo dnf -y install podman
 End of installation procedures…..Let's get into running Podman containers and pods…!
 
-Step #2 - Running Podman Containers:
+Section #2 - Running Podman Containers:
 In this stage, we are going to learn few commands to Run, Checking Status, Stopping and Restarting containers.
 Do a quick validation for any containers that might be running or in a stopped state. Actually, we just installed the Podman packages and yet to run containers. But, it's always a good practice to check what's running before starting new containers.
 $ podman ps -a
@@ -53,7 +46,7 @@ Examples:
   podman ps -a
   podman ps -a --format "{{.ID}}  {{.Image}}  {{.Labels}}  {{.Mounts}}"
   podman ps --size --sort names ]
-Search for a specific image in Docker or Redhat registry that is required to run our first container. In this example: we are searching for 'HTTP' container. 
+Search for a specific image in Docker or Red Hat registry that is required to run our first container. In this example: we are searching for 'HTTP' container. 
 → After going through the steps, repeat these steps for Nginx or Tomcat container deployment as lab exercises. So that, you get lot of confidence to run at large scale
 $ podman search httpd
 Search registry for image
@@ -64,7 +57,7 @@ Usage:
 Examples:
   podman search --filter=is-official --limit 3 alpine
 
-(You will see a list of images available in the Redhat or Docker registry. Please copy the 'Name' of the image.
+(You will see a list of images available in the RedHat or Docker registry. Please copy the 'Name' of the image.
 Example: docker.io docker.io/library/httpd Apache HTTP Server)
 Let's run HTTP container taking the image name captured in the previous (above) command.
 $ podman run -dt docker.io/centos/httpd-24-centos8
@@ -90,7 +83,7 @@ $ podman ps -a
 Note: I have trimmed the output of this command. You should see in a tabular format with more details
 Congratulations, you have successfully finished running containers via Podman. Try to repeat these steps for Nginx, Tomcat or MySQL images. You will get lot of hands-on as well. Next, we will get into validating, managing containers and learning more on container specifications like Network, Storage and Monitoring aspects.
 
-Step #3 - Managing Podman Containers:
+Section #3 - Managing Podman Containers:
 Now, we will learn few basic podman command functionalities to create, run, stop, start, restart and pause containers.
 $ podman create --name=pms docker.io/plexinc/pms-docker
 Trying to pull docker.io/plexinc/pms-docker:latest...
@@ -124,6 +117,123 @@ f18fdb3550fcd07446d07e4d7f15548a8d7b9fe317698220d4715b89a1e22b12
 [f18fdb3550fc is the container id in my machine]
 Note: Loads of such utilities, please visit RedHat documentation for more details and hands-on labs!
 
-Step #4 - Podman Container Storage, Networking and Monitoring aspects:
-Now, we will learn few basic podman command functionalities to create, run, stop, start, restart and pause containers.
+Section #4 - Podman Container Storage, Networking and Monitoring aspects:
 
+→ Podman Storage
+Now, let's create a local directory and get it mounted to a container. Another scenarios to create a podman specific volume and getting it mounted to a container. Let's try to run these 2 scenarios.
+Scenario 1:
+(Create directory)
+$ mkdir html
+(Create a welcome file in html directory)
+$ echo "Welcome to Podman containers" > ./html/welcome
+(Let's run Nginx container by mapping this directory)
+$ podman run -dt -n nginx-ctr-1 -v html:/usr/share/nginx/html nginx
+Here, the local directory html is been mapped to container
+(Now, let's validate our welcome note by logging into container)
+$ podman exec -it 55abec550b41 /bin/bash
+We are using exec functionality here for logging into container by using the container id, please replace the container id available in your system.
+(Let's run a curl check to see our welcome note)
+root@55abec550b41:/# curl http://localhost/welcome
+Welcome to Podman containers
+(Wow, it's working)
+
+Scenario 2:
+(Create a persistent volume)
+$ podman volume create pv
+(You should see a list of volumes available in podman instance)
+$ podman volume ls
+(Let's run Nginx container by mapping this volume)
+$ podman run -dt -v pv:/usr/share/nginx/html --name nginx-ctr docker.io/library/nginx:latest
+Here, the local directory html is been mapped to container
+(Now, let's inspect our volume for more details)
+$ podman volume inspect pv
+[
+  {
+    "Name": "persistent-vol",
+    "Driver": "local",
+    "Mountpoint": "/var/lib/containers/storage/volumes/pv/_data",
+    "CreatedAt": "2022-01-30T18:16:27.358981377+05:30",
+    "Labels": {},
+    "Scope": "local",
+    "Options": {}
+  }
+]
+(If you go to the mountpoint location, you should find nginx files)
+$ pwd
+/var/lib/containers/storage/volumes/persistent-vol/_data
+$ ls -la
+total 8
+drwxr-xr-x. 2 root root  40 Jan 26 14:28 .
+drwx------. 3 root root  19 Jan 30 18:16 ..
+-rw-r--r--. 1 root root 497 Jan 25 20:33 50x.html
+-rw-r--r--. 1 root root 615 Jan 25 20:33 index.html
+(Wow, it's working)
+→ Podman Network
+Now, let's assign a host port to a container. This helps us to access container applications from the web browser. Second scenario is to create an additional network within podman and connecting containers. Let's try to run these 2 scenarios.
+Scenario 1:
+(Create container and publish container port to access via system)
+$ podman run -dt --name nginx-01 -p 8081:80 docker.io/library/nginx
+Trying to pull docker.io/library/nginx:latest...
+Note: Here, container port 80 will be mapped to 8081 on the host.
+Try to access the nginx app via http://localhost:8081
+$ podman run -dt --name nginx-02 -P docker.io/library/nginx
+Note: Here, I am using -P (Uppercase) as a parameter.
+In this case, host port will be assigned automatically.
+Try to access the nginx app via http://localhost:34217
+(See a list of ports exposed by containers at host level)
+$ podman port -a
+2a3fc9ad443a    80/tcp -> 0.0.0.0:8081
+985d28573056    80/tcp -> 0.0.0.0:34217
+$ podman inspect nginx-01 | grep IPAddress
+            "IPAddress": "",
+                    "IPAddress": "10.xx.xx.xx"
+Note: We will see only one IPAddress, after creating a secondary network and attaching would assign 2 IP addresses accordingly.
+Scenario 2:
+(Create a secondary network to attach container to 2nd one)
+$ podman network create custom-network
+Note: I have created a secondary n/w by a name 'custom-network'
+(List of all container networks available on the machine)
+$ podman network ls
+NETWORK ID    NAME         VERSION           PLUGINS
+2f259bab93aa  podman          0.4.0  bridge,portmap,firewall,tuning
+47f14d403c4f  custom-network  0.4.0  bridge,portmap,firewall,tuning
+(Now, let's create and connect our container to 2nd network)
+$ podman run -dt --name nginx-03 -p 8082:80 nginx
+$ podman network connect custom-network nginx-03
+(We can check that the 2 IPs assigned to nginx-03 container)
+$ podman inspect nginx-03 | grep IPAddress
+            "IPAddress": "",
+                    "IPAddress": "10.89.xx.xx",
+                    "IPAddress": "10.90.xx.xx",
+Try to access the nginx app via http://10.89.xx.xx:8082
+Try to access the nginx app via http://10.90.xx.xx:8082
+(Wow, it should be working. Congratulations!)
+→ Podman Monitoring
+Healthcheck is a way in which a user can determine the 'health' or readiness of the primary process running inside of a container. It is more than a simple, "Is my container running?" question. Think of it more like, "Is my application ready?" - Brent Baude, Red Hat
+Basic components of Healthchecks:
+ - Command to be executed, Number of retries, Interval to run the healthcheck, Start-period for the container and Timeout for the command
+Now, let's dive into the scenarios!
+Scenario 1:
+(We are passing --health-cmd and --health-interval for healthchecks)
+$ podman run -dt --name nginx-01 --health-cmd 'curl http://localhost || exit 1' --health-interval=0 nginx
+Resolved "nginx" as an alias (/var/cache/containers/short-name-aliases.conf)
+Note: Here, we are monitoring exit code. If it's 1 it's unhealthy.
+If the exit code is 0 (zero), then it's healthy.
+$ podman healthcheck run nginx-01
+healthy
+(We are trying to grep redhat-release v8 from rhel7 container, where it is going to be tagged as unhealthy with healthcheck parameters)
+$ podman run -dt --name redhat8 --health-cmd 'cat /etc/redhat-release | grep 8' --health-interval=0 ubi7:latest
+$ podman healthcheck run redhat8
+unhealthy
+Scenario 2:
+(Here, we have to use podman system command and podman events to monitor the overall health of the podman instance/containers running)
+$ podman system df
+TYPE           TOTAL       ACTIVE      SIZE        RECLAIMABLE
+Images         3           3           520.6MB     0B (0%)
+Containers     3           3           1.107kB     0B (0%)
+Local Volumes  0           0           0B          0B (0%)
+$ podman events --since 10m
+(Podman events are helpful for troubleshooting)
+2022-01-30 21:12:26.76537185 +0530 IST container cleanup dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01, maintainer=NGINX Docker Maintainers <docker-maint@nginx.com>)
+2022-01-30 21:12:26.7657126 +0530 IST container stop dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01, maintainer=NGINX Docker Maintainers <docker-maint@nginx.com>)
+2022-01-30 21:12:26.79837275 +0530 IST container died dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01)
