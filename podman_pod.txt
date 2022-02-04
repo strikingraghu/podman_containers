@@ -1,7 +1,5 @@
 Launching Wordpress POD on Podman instance:
 podman pod create --name dev-wordpress --publish 8080:80
-podman run --detach --pod dev-wordpress -e MYSQL_ROOT_PASSWORD="password" -e MYSQL_DATABASE=wpdb -e MYSQL_USER=mysqluser -e MYSQL_PASSWORD="welcom
-e" --name wp-db mariadb
-podman run --detach --pod dev-wordpress -e WORDPRESS_DB_HOST='127.0.0.1' -e WORDPRESS_DB_NAME=wpdb -e WORDPRESS_DB_USER=mysqluser -e WORDPRESS_DB_
-PASSWORD="welcome" --name wp-app wordpress
+podman run --detach --pod dev-wordpress -e MYSQL_ROOT_PASSWORD="password" -e MYSQL_DATABASE=wpdb -e MYSQL_USER=mysqluser -e MYSQL_PASSWORD="welcome" --name wp-db mariadb
+podman run --detach --pod dev-wordpress -e WORDPRESS_DB_HOST='127.0.0.1' -e WORDPRESS_DB_NAME=wpdb -e WORDPRESS_DB_USER=mysqluser -e WORDPRESS_DB_PASSWORD="welcome" --name wp-app wordpress
 
