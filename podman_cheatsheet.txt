@@ -1,18 +1,17 @@
-Podman Containers - Beginner's Guide
 Podman is an open-source tool for managing containers, images, volumes, and pods (group of containers). Podman is based on libpod library APIs for managing container lifecycles and supports multiple container image formats, including OCI (Open Container Initiative) and Docker images.
-Running the container tools such as Podman, Skopeo, or Buildah as a user with superuser privileges (root user) is the best way to ensure that your containers have full access to any feature available on your system. 
-However, with the feature called "Rootless Containers" generally available as of RHEL 8.1, you can work with containers as a regular user. Although container engines, such as Docker, let you run Docker commands as a regular (non-root) user, the Docker daemon that carries out those requests runs as root. As a result, regular users can make requests through their containers that can harm the system. 
+Running the container tools such as Podman, Skopeo, or Buildah as a user with superuser privileges (root user) is the best way to ensure that your containers have full access to any feature available on your system.
+However, with the feature called “Rootless Containers” generally available as of RHEL 8.1, you can work with containers as a regular user. Although container engines, such as Docker, let you run Docker commands as a regular (non-root) user, the Docker daemon that carries out those requests runs as root. As a result, regular users can make requests through their containers that can harm the system.
 By setting up rootless container users, system administrators prevent potentially damaging container activities from regular users, while still allowing those users to safely run most container features under their own accounts.
-Unlike other container tools implementations, the tools described here do not center around the monolithic Docker container engine and docker command. Instead, Red Hat provides a set of command-line tools that can operate without a container engine. These include: 
-podman - for directly managing pods and container images (ps, run, stop, start, attach, exec, and so on) 
-buildah - for building, pushing, and signing container images 
-skopeo - for copying, inspecting, deleting, and signing images 
-runc - for providing container run and build features to podman and buildah 
-crun - an optional runtime that can be configured and gives greater flexibility, control, and security for rootless containers
-
+Unlike other container tools implementations, the tools described here do not center around the monolithic Docker container engine and docker command. Instead, Red Hat provides a set of command-line tools that can operate without a container engine. These include:
+podman — for directly managing pods and container images (ps, run, stop, start, attach, exec, and so on)
+buildah — for building, pushing, and signing container images
+skopeo — for copying, inspecting, deleting, and signing images
+runc — for providing container run and build features to podman and buildah
+crun — an optional runtime that can be configured and gives greater flexibility, control, and security for rootless containers
 Difference between Docker containers vs Podman containers:
-Now, let's proceed further on the installation steps:
-Section #1 - Podman Installation Process:
+
+Now, let’s proceed further on the installation steps:
+Section #1 — Podman Installation Process:
 RHEL8
 Podman is included in the container-tools module, along with Buildah and Skopeo.
 sudo yum module enable -y container-tools:rhel8
@@ -30,11 +29,10 @@ The podman package is available in the Debian 11 (Bullseye) repositories and lat
 sudo apt-get -y install podman
 Fedora
 sudo dnf -y install podman
-End of installation procedures…..Let's get into running Podman containers and pods…!
-
-Section #2 - Running Podman Containers:
+End of installation procedures…..Let’s get into running Podman containers and pods…!
+Section #2 — Running Podman Containers:
 In this stage, we are going to learn few commands to Run, Checking Status, Stopping and Restarting containers.
-Do a quick validation for any containers that might be running or in a stopped state. Actually, we just installed the Podman packages and yet to run containers. But, it's always a good practice to check what's running before starting new containers.
+Do a quick validation for any containers that might be running or in a stopped state. Actually, we just installed the Podman packages and yet to run containers. But, it’s always a good practice to check what’s running before starting new containers.
 $ podman ps -a
 CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
 [ List containers
@@ -46,7 +44,7 @@ Examples:
   podman ps -a
   podman ps -a --format "{{.ID}}  {{.Image}}  {{.Labels}}  {{.Mounts}}"
   podman ps --size --sort names ]
-Search for a specific image in Docker or Red Hat registry that is required to run our first container. In this example: we are searching for 'HTTP' container. 
+Search for a specific image in Docker or Red Hat registry that is required to run our first container. In this example: we are searching for ‘HTTP’ container.
 → After going through the steps, repeat these steps for Nginx or Tomcat container deployment as lab exercises. So that, you get lot of confidence to run at large scale
 $ podman search httpd
 Search registry for image
@@ -59,7 +57,7 @@ Examples:
 
 (You will see a list of images available in the RedHat or Docker registry. Please copy the 'Name' of the image.
 Example: docker.io docker.io/library/httpd Apache HTTP Server)
-Let's run HTTP container taking the image name captured in the previous (above) command.
+Let’s run HTTP container taking the image name captured in the previous (above) command.
 $ podman run -dt docker.io/centos/httpd-24-centos8
 Trying to pull docker.io/centos/httpd-24-centos8:latest...
 Getting image source signatures
@@ -77,13 +75,12 @@ Writing manifest to image destination
 Storing signatures
 7ac5a3ab02fc262cea888d71eb1a08f086aa51ef374e31ec23a2bda04608503d
 Note: -dt (Using --detach and --tty parameters, which helps us to run container in background mode and allocate a pseudo-TTY for container respectively)
-Now, let's see the status of the HTTPD container by using below command.
+Now, let’s see the status of the HTTPD container by using below command.
 $ podman ps -a
 (ContainerID) 7ac5a3ab02fc3 (Status) 3 minutes ago  Up 3 minutes ago
 Note: I have trimmed the output of this command. You should see in a tabular format with more details
 Congratulations, you have successfully finished running containers via Podman. Try to repeat these steps for Nginx, Tomcat or MySQL images. You will get lot of hands-on as well. Next, we will get into validating, managing containers and learning more on container specifications like Network, Storage and Monitoring aspects.
-
-Section #3 - Managing Podman Containers:
+Section #3 — Managing Podman Containers:
 Now, we will learn few basic podman command functionalities to create, run, stop, start, restart and pause containers.
 $ podman create --name=pms docker.io/plexinc/pms-docker
 Trying to pull docker.io/plexinc/pms-docker:latest...
@@ -100,7 +97,7 @@ $ podman ps -a
 CONTAINERID    IMAGE         CREATED       STATUS     NAMES
 f18fdb3550fc  pms-docker   4 seconds ago   Created     pms
 Note: Here, we are just creating a container and not yet started. We have to use start command to run the containers. Alternatively, we can directly use 'podman run' command to create and run container in one-shot.
-Let's run the container and play with other command functionalities.
+Let’s run the container and play with other command functionalities.
 $ podman container start f18fdb3550fc 
 [f18fdb3550fc is the container id in my machine]
 Note: I have used 'podman container' CLI method to start a container. Otherwise, we can also start a container using podman start <IMAGE ID>, where both options are same! One thing to note, podman provides multiple ways to stop, start, restart or kills commands. Try to learn them by switching the methods provided.
@@ -116,11 +113,9 @@ $ podman unpause f18fdb3550fc
 f18fdb3550fcd07446d07e4d7f15548a8d7b9fe317698220d4715b89a1e22b12
 [f18fdb3550fc is the container id in my machine]
 Note: Loads of such utilities, please visit RedHat documentation for more details and hands-on labs!
-
-Section #4 - Podman Container Storage, Networking and Monitoring aspects:
-
+Section #4 — Podman Container Storage, Networking and Monitoring aspects:
 → Podman Storage
-Now, let's create a local directory and get it mounted to a container. Another scenarios to create a podman specific volume and getting it mounted to a container. Let's try to run these 2 scenarios.
+Now, let’s create a local directory and get it mounted to a container. Another scenarios to create a podman specific volume and getting it mounted to a container. Let’s try to run these 2 scenarios.
 Scenario 1:
 (Create directory)
 $ mkdir html
@@ -136,7 +131,6 @@ We are using exec functionality here for logging into container by using the con
 root@55abec550b41:/# curl http://localhost/welcome
 Welcome to Podman containers
 (Wow, it's working)
-
 Scenario 2:
 (Create a persistent volume)
 $ podman volume create pv
@@ -169,7 +163,7 @@ drwx------. 3 root root  19 Jan 30 18:16 ..
 -rw-r--r--. 1 root root 615 Jan 25 20:33 index.html
 (Wow, it's working)
 → Podman Network
-Now, let's assign a host port to a container. This helps us to access container applications from the web browser. Second scenario is to create an additional network within podman and connecting containers. Let's try to run these 2 scenarios.
+Now, let’s assign a host port to a container. This helps us to access container applications from the web browser. Second scenario is to create an additional network within podman and connecting containers. Let’s try to run these 2 scenarios.
 Scenario 1:
 (Create container and publish container port to access via system)
 $ podman run -dt --name nginx-01 -p 8081:80 docker.io/library/nginx
@@ -209,10 +203,10 @@ Try to access the nginx app via http://10.89.xx.xx:8082
 Try to access the nginx app via http://10.90.xx.xx:8082
 (Wow, it should be working. Congratulations!)
 → Podman Monitoring
-Healthcheck is a way in which a user can determine the 'health' or readiness of the primary process running inside of a container. It is more than a simple, "Is my container running?" question. Think of it more like, "Is my application ready?" - Brent Baude, Red Hat
+Healthcheck is a way in which a user can determine the ‘health’ or readiness of the primary process running inside of a container. It is more than a simple, “Is my container running?” question. Think of it more like, “Is my application ready?” — Brent Baude, Red Hat
 Basic components of Healthchecks:
- - Command to be executed, Number of retries, Interval to run the healthcheck, Start-period for the container and Timeout for the command
-Now, let's dive into the scenarios!
+— Command to be executed, Number of retries, Interval to run the healthcheck, Start-period for the container and Timeout for the command
+Now, let’s dive into the scenarios!
 Scenario 1:
 (We are passing --health-cmd and --health-interval for healthchecks)
 $ podman run -dt --name nginx-01 --health-cmd 'curl http://localhost || exit 1' --health-interval=0 nginx
@@ -237,3 +231,99 @@ $ podman events --since 10m
 2022-01-30 21:12:26.76537185 +0530 IST container cleanup dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01, maintainer=NGINX Docker Maintainers <docker-maint@nginx.com>)
 2022-01-30 21:12:26.7657126 +0530 IST container stop dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01, maintainer=NGINX Docker Maintainers <docker-maint@nginx.com>)
 2022-01-30 21:12:26.79837275 +0530 IST container died dc5a9a082d2e22bc7611c1aa4e664a5dffb67f5ac4c385f8162b6440e1e941a3 (image=docker.io/library/nginx:latest, name=nginx-01)
+Section #5 — Buildah:
+Buildah is a tool that facilitates building the OCI images. While there are a great number of preconfigured container images available, sometimes you will need to create your own custom container images. Buildah is part of the Podman landscape that allows you to do in this section. Let’s start:
+Here, we are going to use the available commands to build the OCI custom images by using Buildah tool.
+$ buildah --help
+A tool that facilitates building OCI images
+Usage:
+  buildah [flags]
+  buildah [command]
+Available Commands:
+  add         Add content to the container
+  bud         Build an image using instructions in a Dockerfile
+  commit      Create an image from a working container
+  config      Update image configuration settings
+  containers  List working containers and their base images
+  copy        Copy content into the container
+  from        Create a working container based on an image
+  help        Help about any command
+  images      List images in local storage
+  info        Display Buildah system information
+  inspect     Inspect the configuration of a container or image
+  login       Login to a container registry
+  logout      Logout of a container registry
+  manifest    Manipulate manifest lists and image indexes
+  mount       Mount a working container's root filesystem
+  pull        Pull an image from the specified location
+  push        Push an image to a specified destination
+  rename      Rename a container
+  rm          Remove one or more working containers
+  rmi         Remove one or more images from local storage
+  run         Run a command inside of the container
+  source      Manage source containers
+  tag         Add an additional name to a local image
+  umount      Unmount the rfs of the specified working containers
+  unshare     Run a command in a modified user namespace
+  version     Display the Buildah version information
+Now, let’s try to build a ‘HTTPD’ custom container by using buildah commands.
+container=$(buildah from fedora:latest)
+buildah config --label maintainer="buildah@podman.rulez" $container
+buildah run $container dnf install -y httpd
+buildah run $container dnf clean all
+buildah run $container bash -c "echo \"Welcome to Podman container\" > /var/www/html/welcome"
+buildah config --port 80 $container
+buildah config --cmd "/usr/sbin/httpd -DFOREGROUND" $container
+buildah commit --format docker $container buildah-httpd:latest
+Note: We have few commands mentioned above to build OCI images using Buildah tool. These commands can be dropped in a shell script to get them executed in one-shot. Once done, you will see a 'buildah containers' as well. Try running 'buildah containers' before and after running these commands.
+Section #6 — Skopeo:
+Skopeo is a command line utility providing various operations with container images and container image registries. For example, it is able to inspect a repository on a Docker registry and fetch image. It fetches the repository’s manifest and it is able to show you a docker inspect-like json output about a whole repository or a tag. This tool, in contrast to docker inspect, helps you gather useful information about a repository or a tag without requiring you to run docker pull — e.g. — which tags are available for the given repository? which labels the image has? Now, let’s run few commands on Skopeo tool.
+skopeo inspect
+Review information for the image fedora from the docker.io registry:
+$ skopeo inspect docker://docker.io/fedora
+{
+    "Name": "docker.io/library/fedora",
+    "Digest": "sha256:a97914edb6ba15deb5c5acf87bd6bd5b6b0408c96f48a5cbd450b5b04509bb7d",
+    "RepoTags": [
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "heisenbug",
+        "latest",
+        "rawhide"
+    ],
+    "Created": "2016-06-20T19:33:43.220526898Z",
+    "DockerVersion": "1.10.3",
+    "Labels": {},
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Layers": [
+        "sha256:7c91a140e7a1025c3bc3aace4c80c0d9933ac4ee24b8630a6b0b5d8b9ce6b9d4"
+    ]
+}
+Another method to retrieve the layers for the busybox image from the docker.io registry:
+$ skopeo layers docker://busybox
+$ ls layers-500650331/
+  8ddc19f16526912237dd8af81971d5e4dd0587907234be2b83e249518d5b673f.tar
+  manifest.json
+  a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4.tar
+Additional commands to help you on Skopeo tool:
+$ skopeo --help
+Various operations with container images and container image registries
+Usage:
+  skopeo [command]
+Available Commands:
+ copy                Copy an IMAGE-NAME from one location to another
+ delete              Delete image IMAGE-NAME
+ help                Help about any command
+ inspect             Inspect image IMAGE-NAME
+ list-tags           List tags in the transport/repository specified
+ login               Login to a container registry
+ logout              Logout of a container registry
+ manifest-digest     Compute a manifest digest of a file
+ standalone-sign     Create a signature using local files
+ standalone-verify   Verify a signature using local files
+ sync                Synchronize images from one location to another
+This concludes few details on Podman, Buildah and Skopeo tools used in the application containers technology. Thanks!
